@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8" />
-  <title>Maqueta ADN - Bioquímica y Biología Molecular</title>
+  <title>Maqueta ADN - Bioquímica y Biología Molecular (AR Móvil)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <style>
     * {
@@ -158,24 +157,48 @@
       0% {
         transform: rotateY(0deg);
       }
-
       100% {
         transform: rotateY(360deg);
       }
     }
 
+    /* Cada "peldaño" de la hélice ahora es un PAR de bases (barras) */
     .dna-step {
       position: absolute;
       left: 50%;
+      transform-origin: center center;
       transform: translateX(-50%);
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #38bdf8;
-      /* Bases 1 */
-      box-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
+      width: 0;
+      height: 0;
     }
 
+    .base {
+      position: absolute;
+      width: 26px;
+      height: 7px;
+      border-radius: 4px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.6);
+    }
+
+    .left-base {
+      right: 6px;
+      transform-origin: right center;
+      transform: rotate(14deg);
+    }
+
+    .right-base {
+      left: 6px;
+      transform-origin: left center;
+      transform: rotate(-14deg);
+    }
+
+    /* Colores por base nitrogenada */
+    .base-A { background: #7CFF8D; box-shadow: 0 0 10px #7CFF8DBB; }
+    .base-T { background: #C38BFF; box-shadow: 0 0 10px #C38BFFBB; }
+    .base-C { background: #FF8DB7; box-shadow: 0 0 10px #FF8DB7BB; }
+    .base-G { background: #7DB3FF; box-shadow: 0 0 10px #7DB3FFBB; }
+
+    /* Esqueleto azúcar-fosfato (cintas amarillas) */
     .dna-step::before,
     .dna-step::after {
       content: "";
@@ -185,18 +208,20 @@
       height: 4px;
       margin-top: -2px;
       border-radius: 999px;
-      background: linear-gradient(90deg, #22c55e, #eab308);
-      /* esqueleto azúcar-fosfato */
+      background: #E9BF64;
+      box-shadow: 0 0 10px rgba(233, 191, 100, 0.7);
     }
 
     .dna-step::before {
-      right: 5px;
-      transform-origin: right;
+      right: 0;
+      transform-origin: right center;
+      transform: rotate(18deg);
     }
 
     .dna-step::after {
-      left: 5px;
-      transform-origin: left;
+      left: 0;
+      transform-origin: left center;
+      transform: rotate(-18deg);
     }
 
     .dna-label {
@@ -282,10 +307,21 @@
 
     .dna-legend li {
       margin-bottom: 0.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
     }
 
     .dna-legend strong {
       color: #bfdbfe;
+    }
+
+    .color-box {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      box-shadow: 0 0 8px rgba(255,255,255,0.4);
     }
 
     /* TEORÍA */
@@ -334,8 +370,8 @@
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      width: 190px;
-      height: 290px;
+      width: 210px;
+      height: 320px;
       border-radius: 24px;
       display: flex;
       align-items: center;
@@ -349,6 +385,7 @@
         0 0 22px rgba(59, 130, 246, 0.35),
         0 0 40px rgba(59, 130, 246, 0.25);
       border: 1px solid rgba(148, 163, 184, 0.8);
+      padding: 0.4rem 0.5rem;
     }
 
     .dna-helix-ar-wrapper {
@@ -365,10 +402,25 @@
     }
 
     .ar-overlay-dna-inner span {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       text-align: center;
       opacity: 0.9;
-      margin-top: 0.3rem;
+      margin-top: 0.25rem;
+    }
+
+    .ar-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem 0.6rem;
+      justify-content: center;
+      margin-top: 0.25rem;
+      font-size: 0.7rem;
+    }
+
+    .ar-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.2rem;
     }
 
     .camera-hint {
@@ -440,26 +492,24 @@
     }
   </style>
 </head>
-
 <body>
   <canvas id="particles"></canvas>
 
   <header>
     <h1>Visualizador Interactivo de ADN</h1>
     <p>
-      Maqueta digital para Bioquímica y Biología Molecular con visualización 3D y modo tipo realidad aumentada bueno
-      intento de realidad aumentada jaja.
+      Maqueta digital para Bioquímica y Biología Molecular con visualización 3D anotada y modo tipo realidad aumentada.
     </p>
     <div class="project-info">
       <strong>Alumno:</strong> David Alessandro Hernandez Cervantes &nbsp;|&nbsp;
       <strong>Universidad de Santa Fe</strong> &nbsp;|&nbsp;
-      <strong>Licenciatura en Medicina</strong> &nbsp;|&nbsp;
-      <strong>Grupo C, Semestre 1</strong>
-
+       <strong>1-C</strong> &nbsp;|&nbsp;
+        <strong>Licenciatura en Medicina</strong>
     </div>
-    <div>
+       <div>
       <img src="img1.png" alt="" srcset="" style="filter: invert(1);">
     </div>
+    
   </header>
 
   <main>
@@ -523,13 +573,14 @@
             </div>
           </div>
           <div class="dna-label">
-            Doble hélice de ADN animada con anotaciones estructurales
+            Doble hélice de ADN animada con barras de bases complementarias
           </div>
           <ul class="dna-legend">
-            <li><strong>Esferas azules/moradas:</strong> bases nitrogenadas.</li>
-            <li><strong>Barras verde-amarillas:</strong> esqueleto azúcar-fosfato (enlaces fosfodiéster).</li>
-            <li><strong>Surco mayor / menor:</strong> espacios donde interactúan proteínas reguladoras.</li>
-            <li><strong>Extremos 5′ y 3′:</strong> direccionalidad de cada cadena (antiparalela).</li>
+            <li><span class="color-box" style="background:#7CFF8D;"></span><strong>Adenina (A)</strong> &mdash; verde.</li>
+            <li><span class="color-box" style="background:#C38BFF;"></span><strong>Timina (T)</strong> &mdash; morado.</li>
+            <li><span class="color-box" style="background:#FF8DB7;"></span><strong>Citosina (C)</strong> &mdash; rosa.</li>
+            <li><span class="color-box" style="background:#7DB3FF;"></span><strong>Guanina (G)</strong> &mdash; azul.</li>
+            <li><span class="color-box" style="background:#E9BF64;"></span><strong>Esqueleto azúcar-fosfato</strong> &mdash; cintas amarillas.</li>
           </ul>
         </div>
       </div>
@@ -579,12 +630,7 @@
          ========================== -->
     <section class="card" id="ar-section">
       <h2>3. Visualización tipo realidad aumentada</h2>
-      <p>
-        En esta sección se usa la cámara del dispositivo como fondo y se superpone una doble hélice
-        de ADN animada. Toca sobre la imagen para “colocar” la hélice sobre tu cuaderno, mano o libro,
-        y ajusta el tamaño con el control deslizante.
-      </p>
-
+   
       <div style="margin-top: 0.8rem;">
         <button class="btn" id="start-camera-btn">Activar cámara</button>
         <button class="btn secondary" id="stop-camera-btn">Detener cámara</button>
@@ -596,7 +642,6 @@
         <span id="scale-label">100%</span>
       </div>
 
-
       <div class="camera-wrapper" id="camera-wrapper" style="margin-top: 0.8rem;">
         <video id="camera" autoplay playsinline muted></video>
         <div class="ar-overlay-dna">
@@ -605,12 +650,29 @@
               <div class="dna-helix dna-helix-ar" id="dna-helix-ar"></div>
             </div>
             <span>
-              Toca la imagen para mover la hélice de ADN<br />
-              y alinéala con el objeto que quieras señalar.
+              Toca la imagen para mover la hélice de ADN y alinéala con el objeto que quieras señalar.
             </span>
+            <div class="ar-legend">
+              <div class="ar-legend-item">
+                <span class="color-box" style="background:#7CFF8D;"></span><span>A = Adenina</span>
+              </div>
+              <div class="ar-legend-item">
+                <span class="color-box" style="background:#C38BFF;"></span><span>T = Timina</span>
+              </div>
+              <div class="ar-legend-item">
+                <span class="color-box" style="background:#FF8DB7;"></span><span>C = Citosina</span>
+              </div>
+              <div class="ar-legend-item">
+                <span class="color-box" style="background:#7DB3FF;"></span><span>G = Guanina</span>
+              </div>
+              <div class="ar-legend-item">
+                <span class="color-box" style="background:#E9BF64;"></span><span>Esqueleto azúcar-fosfato</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
     </section>
 
     <!-- =========================
@@ -714,7 +776,29 @@
     createParticles();
     drawParticles();
 
-    /* Hélix ADN */
+    /* Hélix ADN con pares de bases en barras */
+    const BASE_COLORS = {
+      A: "#7CFF8D", // verde
+      T: "#C38BFF", // morado
+      C: "#FF8DB7", // rosa
+      G: "#7DB3FF"  // azul
+    };
+
+    const BASE_NAMES = {
+      A: "Adenina (A)",
+      T: "Timina (T)",
+      C: "Citosina (C)",
+      G: "Guanina (G)"
+    };
+
+    // Secuencia complementaria repetida: A-T, C-G, A-T, C-G...
+    const BASE_PAIR_SEQUENCE = [
+      ["A", "T"],
+      ["C", "G"],
+      ["A", "T"],
+      ["C", "G"]
+    ];
+
     function createHelix(elementId, steps, height) {
       const helix = document.getElementById(elementId);
       if (!helix) return;
@@ -731,11 +815,20 @@
         step.style.top = y + "px";
         step.style.transform = `translateX(-50%) translateZ(${depth}px) rotateY(${angle}deg)`;
 
-        if (i % 2 === 0) {
-          step.style.background = "#38bdf8"; // bases 1
-        } else {
-          step.style.background = "#a855f7"; // bases 2
-        }
+        const pair = BASE_PAIR_SEQUENCE[i % BASE_PAIR_SEQUENCE.length];
+        const leftBaseType = pair[0];
+        const rightBaseType = pair[1];
+
+        const leftBase = document.createElement("div");
+        leftBase.classList.add("base", "left-base", `base-${leftBaseType}`);
+        leftBase.title = BASE_NAMES[leftBaseType];
+
+        const rightBase = document.createElement("div");
+        rightBase.classList.add("base", "right-base", `base-${rightBaseType}`);
+        rightBase.title = BASE_NAMES[rightBaseType];
+
+        step.appendChild(leftBase);
+        step.appendChild(rightBase);
 
         helix.appendChild(step);
       }
@@ -745,9 +838,7 @@
     createHelix("dna-helix-ar", 16, 220);
 
     function scrollToSection(id) {
-      document.getElementById(id).scrollIntoView({
-        behavior: "smooth"
-      });
+      document.getElementById(id).scrollIntoView({ behavior: "smooth" });
     }
     window.scrollToSection = scrollToSection;
 
@@ -768,15 +859,9 @@
         const constraints = {
           audio: false,
           video: {
-            facingMode: {
-              ideal: "environment"
-            },
-            width: {
-              ideal: 1280
-            },
-            height: {
-              ideal: 720
-            }
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
           }
         };
         cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -863,5 +948,4 @@
     });
   </script>
 </body>
-
 </html>
